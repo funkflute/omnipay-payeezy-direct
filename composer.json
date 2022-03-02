@@ -29,6 +29,6 @@
         "ext-json": "*"
     },
     "require-dev": {
-        "omnipay/tests": "^3"
+        "omnipay/tests": "^4"
     }
 }

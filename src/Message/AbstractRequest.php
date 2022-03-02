@@ -3,6 +3,7 @@
 namespace Omnipay\PayeezyDirect\Message;
 
 use Exception;
+use Http\Client\Exception\HttpException;
 use JsonException;
 use Omnipay\PayeezyDirect\Exceptions\PaymentAuthorizationException;
 use Omnipay\PayeezyDirect\Exceptions\PaymentInvalidRequestException;
@@ -143,6 +144,8 @@ abstract class AbstractRequest extends BaseRequest
      * @throws PaymentAuthorizationException
      * @throws PaymentInvalidRequestException
      * @throws PaymentInvalidResponseException
+     * @throws \Http\Client\Exception\RequestException
+     * @throws \Http\Client\Exception\NetworkException
      *
      * @return Response
      */
@@ -166,14 +169,10 @@ abstract class AbstractRequest extends BaseRequest
             return $this->createResponse(json_decode($body, false, 512, JSON_THROW_ON_ERROR));
         } catch (JsonException $e) {
             throw new PaymentInvalidResponseException($e->getMessage());
-        } catch (Exception $e) {
-            // if we have a response
-            if ($contents = $response->getBody()->getContents()) {
-                // parse the error message
-                return $this->createResponse($contents);
-            }
-            // otherwise just throw up the exception
-            throw new PaymentInvalidResponseException($e->getMessage());
+        } catch (HttpException $e) {
+            // if we have a response return the error as response
+            return $this->createResponse($e->getResponse()->getBody()->getContents());
+            // otherwise just let it bubble up
         }
     }
 
