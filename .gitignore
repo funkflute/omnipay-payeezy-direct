@@ -9,3 +9,4 @@ dirlist.cache
 dirlist.vendor
 phpunit.xml
 /http_data
+.phpunit.result.cache
